@@ -1,3 +1,6 @@
+# SyllaClaw — Academic Life Management Agent
+# Install: pip3 install -r requirements.txt
+
 requests>=2.31.0
 python-dotenv>=1.0.0
 pdfminer.six>=20221105

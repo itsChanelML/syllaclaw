@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 from typing import List, Optional
 
-from display import (
+from Syllaclaw.display import (
     banner, div, log_t, log_p, log_g, log_a, log_r, log_gr,
     log_status, TEAL, RESET, BOLD, AMBER, GREEN, GRAY
 )
@@ -18,7 +18,7 @@ from nim_client import (
     NIMError, parse_syllabus, parse_work_schedule,
     build_weekly_schedule, write_weekly_briefing
 )
-from schedule import (
+from Syllaclaw.schedule import (
     detect_conflicts, suggest_reschedules,
     get_upcoming_deadlines, map_blocks_to_dates, get_next_monday
 )

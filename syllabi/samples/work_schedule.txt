@@ -1,0 +1,12 @@
+STARBUCKS PARTNER SCHEDULE
+Store #: 12847 | Repeating weekly
+
+Monday:    OFF
+Tuesday:   4:00 PM - 9:00 PM  (5 hrs)
+Wednesday: OFF
+Thursday:  4:00 PM - 9:00 PM  (5 hrs)
+Friday:    OFF
+Saturday:  8:00 AM - 2:00 PM  (6 hrs)
+Sunday:    10:00 AM - 3:00 PM (5 hrs)
+
+Total weekly hours: 21
