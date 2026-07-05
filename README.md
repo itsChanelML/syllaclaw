@@ -1,9 +1,9 @@
 # SyllaClaw 📚
 ### Drop Your Syllabus. Get Your Life.
 
-**Built for College students. Free to build. Free to run.**
+**Built for College & Graduate Students. Free to build. Free to run.**
 
-> Students don't always have someone to aleart them about the havoc in Week 8 is coming. SyllaClaw encodes that knowledge and makes it available to every student, for free.
+> Nobody warned you that teh havoc of Week 8 was coming. SyllaClaw encodes that knowledge — and makes it available to every student, for free.
 
 ---
 
@@ -18,6 +18,7 @@ You drop your syllabus files into a folder. SyllaClaw reads every one of them, e
 - Heavy weeks flagged before they hit you, with specific reschedule suggestions
 - A Sunday evening briefing that tells you exactly what to focus on next week
 - An ESCALATE alert when something is wrong — unreadable file, impossible schedule — with a precise fix
+- A learning system that gets smarter every week based on how you actually live
 
 **What it costs:** Nothing. One free NVIDIA NIM API key. The Google account your university already gave you.
 
@@ -48,7 +49,33 @@ Step 5 — export_csv           Output Google Calendar-compatible CSV files.
 Step 6 — weekly_briefing      Write a personalized Sunday evening briefing for the week ahead.
 ```
 
-When something goes wrong, the agent doesn't crash silently. It stops and tells you exactly what failed and what to do next — this is called an **ESCALATE**. You'll see it fire live when you run `python3 syllaclaw.py --break`.
+When something goes wrong the agent doesn't crash silently. It stops and tells you exactly what failed and what to do next — this is called an **ESCALATE**. You'll see it fire live when you run `python3 syllaclaw.py --break`.
+
+---
+
+## How SyllaClaw learns your behavior
+
+After your first week, run the Sunday check-in:
+
+```bash
+python3 syllaclaw.py --checkin
+```
+
+Five questions. Two minutes. SyllaClaw updates your `student_profile.json` and uses it to build a smarter schedule next week.
+
+**What it observes:**
+- Which study blocks you actually completed vs. skipped
+- Whether your job shifts tend to run over
+- What time of day you do your best work
+- New commitments you took on
+
+**What it adjusts:**
+- Moves deep work blocks to your proven productive hours
+- Stops scheduling blocks in time slots you always miss
+- Adds buffer time around shifts that run late
+- Blocks new commitments before building next week
+
+After a few weeks SyllaClaw knows you work best Wednesday mornings, that your Starbucks shift always runs 30 minutes over, and that you'll always say yes to a SHPE event. It builds around that — not around who you wish you were.
 
 ---
 
@@ -80,7 +107,7 @@ pip3 install -r requirements.txt --user
 ```bash
 cp .env.example .env
 ```
-Open `.env` in any text editor and replace `your_nim_api_key_here` with your real key. Also add your name:
+Open `.env` in any text editor and replace `your_nim_api_key_here` with your real key:
 ```
 NIM_API_KEY=nvapi-xxxxxxxxxxxxxxxxxxxx
 STUDENT_NAME=Your Full Name
@@ -110,6 +137,9 @@ python3 syllaclaw.py --demo
 
 # Trigger the ESCALATE beat — shows what happens when a file is unreadable
 python3 syllaclaw.py --break
+
+# Sunday check-in — tell SyllaClaw how your week went
+python3 syllaclaw.py --checkin
 ```
 
 ### Step 6 — Import to Google Calendar
@@ -118,6 +148,7 @@ After running, open the `output/` folder. You'll find:
 - `weekly_schedule.csv` — your full time-blocked week
 - `semester_deadlines.csv` — every deadline across all courses
 - `conflict_report.csv` — your heavy weeks and reschedule suggestions
+- `student_profile.json` — your behavioral profile (updated each Sunday check-in)
 
 **To import:**
 1. Go to [calendar.google.com](https://calendar.google.com)
@@ -155,12 +186,12 @@ Same as Option A Step 1.
 5. Find the `CONFIG` block at the top and fill in your values:
 ```javascript
 const CONFIG = {
-  NIM_API_KEY:   "nvapi-xxxxxxxxxxxxxxxxxxxx",  // your free NIM key
-  STUDENT_NAME:  "Alex Rivera",                 // your name
-  SEMESTER_START: "2026-01-12",                 // first day of classes
-  SEMESTER_END:   "2026-05-15",                 // last day of finals
-  WAKE_TIME:      "07:00",                      // when you wake up
-  SLEEP_TIME:     "23:00",                      // when you go to sleep
+  NIM_API_KEY:    "nvapi-xxxxxxxxxxxxxxxxxxxx",  // your free NIM key
+  STUDENT_NAME:   "Alex Rivera",                 // your name
+  SEMESTER_START: "2026-01-12",                  // first day of classes
+  SEMESTER_END:   "2026-05-15",                  // last day of finals
+  WAKE_TIME:      "07:00",                       // when you wake up
+  SLEEP_TIME:     "23:00",                       // when you go to sleep
 };
 ```
 6. Click **Save** (Ctrl+S)
@@ -175,7 +206,7 @@ A **SyllaClaw** menu will appear in your Sheet toolbar.
 Create sheet tabs named `Syllabus_1`, `Syllabus_2`, etc. Paste your syllabus text into cell A1 of each tab.
 
 **Option 2 — From Google Drive (recommended for PDFs):**
-Upload your PDF syllabus to Google Drive. Right-click → Open with → Google Docs. Google Docs will extract the text from the PDF automatically. Select all (Cmd+A), copy, paste into your Syllabus tab.
+Upload your PDF syllabus to Google Drive. Right-click → Open with → Google Docs. Google Docs extracts the text automatically. Select all (Cmd+A), copy, paste into your Syllabus tab.
 
 ### Step 5 — Add your work schedule (optional)
 
@@ -204,8 +235,6 @@ No CSV download needed. Events appear in Google Calendar the moment you run Step
 
 ## Work schedule format
 
-Whether you're using the CLI or Apps Script, your work schedule should look like this:
-
 ```
 Monday:    OFF
 Tuesday:   4:00 PM - 9:00 PM  (5 hrs)
@@ -222,19 +251,20 @@ SyllaClaw will never schedule a study block during a shift. Work hours are locke
 
 ## How the weekly schedule is built
 
-SyllaClaw uses NVIDIA's Llama-3.3-Nemotron-Super model via NIM to reason over your full week. Here is exactly what it considers:
+SyllaClaw uses NVIDIA's Llama-3.3-Nemotron-Super model via NIM to reason over your full week:
 
 | What | How |
 |------|-----|
 | Work shifts | Locked — never overwritten |
 | Sleep | Consistent wake and bedtime every day |
-| Study blocks | 25-min Pomodoro for memorization/reading, 90-min deep work for problem sets and projects |
+| Study blocks | 25-min Pomodoro for memorization/reading, 90-min deep work for problem sets |
 | Deadline urgency | More study time allocated in the days before something is due |
-| Exam prep | A review session is added the evening before every exam |
+| Exam prep | A review session added the evening before every exam |
 | Meals | Breakfast, lunch, and dinner built into every day |
 | Family calls | 10-minute "Call home 📱" blocks 2–3 times per week |
 | Free time | At least one protected free/social block per day — labeled "Free time — protect this" |
 | Weekly review | 30-minute Sunday evening planning block every week |
+| Learned behavior | After check-ins, adjusts block timing based on your actual completion patterns |
 
 The agent does not fill every hour. It protects the things that make you human.
 
@@ -277,6 +307,7 @@ syllaclaw/
 │   ├── reader.py             # Extracts text from PDF, DOCX, TXT, MD
 │   ├── schedule.py           # Conflict detection and date logic
 │   ├── exporter.py           # Google Calendar CSV output
+│   ├── memory.py             # Student behavioral profile and weekly check-in
 │   └── display.py            # Terminal colors and logging
 ├── scripts/
 │   └── SyllaClaw.gs          # Google Apps Script — paste into Google Sheets
@@ -287,7 +318,7 @@ syllaclaw/
 │   │   └── work_schedule.txt
 │   ├── samples_broken/       # Empty file that triggers the ESCALATE demo
 │   └── (drop your files here)
-├── output/                   # Generated CSV files land here — gitignored
+├── output/                   # Generated CSV files and student_profile.json — gitignored
 ├── requirements.txt
 ├── .env.example
 ├── .gitignore
@@ -319,6 +350,7 @@ syllaclaw/
 | Apps Script: no SyllaClaw menu | Close and reload the Google Sheet after saving the script |
 | `pip3: command not found` | Try `pip` instead of `pip3` |
 | Files not found | Make sure your syllabus files are in the `syllabi/` folder, not a subfolder inside it |
+| `--checkin` not updating schedule | Run `python3 syllaclaw.py` after check-in to rebuild next week with the new profile |
 
 ---
 
@@ -329,7 +361,7 @@ syllaclaw/
 Mentor Me Collective is a 501(c)(3) Technical Institute serving 40,000+ members across 120+ countries with 600+ documented career placements.
 
 - GitHub: [@itsChanelML](https://github.com/itsChanelML)
-- LinkedIn: [/in/chanelpower](https://linkedin.com/in/powerc1)
+- LinkedIn: [/in/powerc1](https://linkedin.com/in/powerc1)
 - Community: [mentormecollective.org](https://mentormecollective.org)
 - Twitter/X: [@itsChanelML](https://twitter.com/itsChanelML)
 
