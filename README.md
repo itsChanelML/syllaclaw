@@ -1,9 +1,9 @@
 # SyllaClaw 📚
-### Drop Your Syllabus. Get Your Life.
+### Drop Your Syllabus. Organize Your Life.
 
 **Built for College & Graduate Students. Free to build. Free to run.**
 
-> Nobody warned you that teh havoc of Week 8 was coming. SyllaClaw encodes that knowledge — and makes it available to every student, for free.
+> Nobody warned you that the havoc of Week 8 was coming. SyllaClaw encodes that knowledge — and makes it available to every student, for free.
 
 ---
 
@@ -367,4 +367,4 @@ Mentor Me Collective is a 501(c)(3) Technical Institute serving 40,000+ members 
 
 ---
 
-*Drop your syllabus. Get your life.*
+*Drop your syllabus. Organize your life.*
