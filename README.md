@@ -1,9 +1,9 @@
 # SyllaClaw 📚
 ### Drop Your Syllabus. Get Your Life.
 
-**Built for STEM students. Free to build. Free to run.**
+**Built for College students. Free to build. Free to run.**
 
-> First-gen students don't always have someone who warned them that Week 8 was coming. SyllaClaw encodes that knowledge — and makes it available to every student, for free.
+> Students don't always have someone to aleart them about the havoc in Week 8 is coming. SyllaClaw encodes that knowledge and makes it available to every student, for free.
 
 ---
 
@@ -324,12 +324,12 @@ syllaclaw/
 
 ## Built by
 
-**Chanel Power** — Senior ML Engineer, Forbes Under 30, Founder of [Mentor Me Collective](https://mentormecollective.org)
+**Chanel Power** — Senior ML Engineer, Startup Advisor, Founder of [Mentor Me Collective](https://mentormecollective.org)
 
 Mentor Me Collective is a 501(c)(3) Technical Institute serving 40,000+ members across 120+ countries with 600+ documented career placements.
 
 - GitHub: [@itsChanelML](https://github.com/itsChanelML)
-- LinkedIn: [/in/chanelpower](https://linkedin.com/in/chanelpower)
+- LinkedIn: [/in/chanelpower](https://linkedin.com/in/powerc1)
 - Community: [mentormecollective.org](https://mentormecollective.org)
 - Twitter/X: [@itsChanelML](https://twitter.com/itsChanelML)
 
