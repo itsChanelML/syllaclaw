@@ -1,162 +1,210 @@
 # SyllaClaw 📚
 ### Drop Your Syllabus. Get Your Life.
+
 **Built for STEM students. Free to build. Free to run.**
 
-> "I spent 3 hours setting up my calendar every semester. SyllaClaw does it in 60 seconds — and it told me Week 8 was going to be brutal before I even knew it."
+> First-gen students don't always have someone who warned them that Week 8 was coming. SyllaClaw encodes that knowledge — and makes it available to every student, for free.
 
 ---
 
 ## What it does
 
-You drop your syllabus files into a folder (or a Google Drive folder). SyllaClaw reads every one of them, extracts every deadline, builds a complete time-blocked weekly schedule around your job and your life, and outputs everything as a CSV you import directly into Google Calendar.
+You drop your syllabus files into a folder. SyllaClaw reads every one of them, extracts every deadline and exam, builds a complete time-blocked weekly schedule around your job and your life, flags your brutal weeks before they arrive, and outputs everything as a CSV that imports directly into Google Calendar.
 
-**What you get:**
-- Every deadline, exam, and project loaded into Google Calendar
-- A complete weekly schedule: when to study, when to sleep, when to call home, when to protect your free time
-- Work shifts locked in as non-negotiable blocks
-- Heavy weeks flagged *before* they arrive
-- A Sunday evening briefing telling you what to focus on next week
+**You get:**
+- Every deadline, exam, project, and quiz loaded into Google Calendar with descriptions
+- A complete time-blocked weekly schedule — study, sleep, work, meals, family calls, and free time
+- Work shifts locked in as non-negotiable blocks — the agent will never schedule over them
+- Heavy weeks flagged before they hit you, with specific reschedule suggestions
+- A Sunday evening briefing that tells you exactly what to focus on next week
+- An ESCALATE alert when something is wrong — unreadable file, impossible schedule — with a precise fix
 
-**What it costs:** Nothing. One free NVIDIA API key. Your existing Google account.
+**What it costs:** Nothing. One free NVIDIA NIM API key. The Google account your university already gave you.
 
 ---
 
 ## Two ways to use it
 
-### Option A — Command Line (for technical students)
-Drop files on your laptop. Run one command in your terminal.
+### Option A — Command Line
+Drop syllabus files on your laptop. Run one command in your terminal. Best for students comfortable with Python.
 
-### Option B — Google Apps Script (for everyone else)
-Works entirely in your browser. No installation. No terminal.
-Drop files in Google Drive. Click a menu item. Done.
+### Option B — Google Apps Script
+Works entirely in your browser. No installation. No terminal. Drop files in Google Drive, click a menu item in Google Sheets, and events appear directly in your Google Calendar. Best for everyone else.
 
-**Both options produce the same output.**
+**Both paths produce the same output. Both are completely free.**
+
+---
+
+## How the agent works
+
+SyllaClaw runs six steps in sequence:
+
+```
+Step 1 — parse_syllabi        Read every file in your folder. Extract all deadlines with estimated study hours.
+Step 2 — parse_work_schedule  Find your work schedule file. Lock those shifts as non-negotiable.
+Step 3 — detect_conflicts     Find weeks where 3+ deliverables pile up. Flag them before you commit to anything.
+Step 4 — build_schedule       Build your complete week: study blocks, sleep, work, meals, family calls, free time.
+Step 5 — export_csv           Output Google Calendar-compatible CSV files.
+Step 6 — weekly_briefing      Write a personalized Sunday evening briefing for the week ahead.
+```
+
+When something goes wrong, the agent doesn't crash silently. It stops and tells you exactly what failed and what to do next — this is called an **ESCALATE**. You'll see it fire live when you run `python3 syllaclaw.py --break`.
 
 ---
 
 ## Option A — Command Line Setup
 
-### Prerequisites
+### What you need
 - Python 3.9 or higher
-- A free NVIDIA NIM API key (see Step 1)
+- A free NVIDIA NIM API key (no credit card required)
 
 ### Step 1 — Get your free NVIDIA NIM key
 1. Go to [build.nvidia.com](https://build.nvidia.com)
-2. Sign in or create a free account — no credit card required
-3. Search for: `llama-3.3-nemotron-super-49b-v1`
-4. Click **Get API Key**
-5. Copy your key — it starts with `nvapi-`
+2. Sign in or create a free account
+3. Search for `llama-3.3-nemotron-super-49b-v1`
+4. Click **Get API Key** — your key starts with `nvapi-`
 
-### Step 2 — Install
+### Step 2 — Clone and install
 ```bash
 git clone https://github.com/itsChanelML/syllaclaw
 cd syllaclaw
 pip3 install -r requirements.txt
 ```
 
+If you're on a university-managed machine:
+```bash
+pip3 install -r requirements.txt --user
+```
+
 ### Step 3 — Set your API key
 ```bash
 cp .env.example .env
-# Open .env and replace the placeholder with your real key
+```
+Open `.env` in any text editor and replace `your_nim_api_key_here` with your real key. Also add your name:
+```
+NIM_API_KEY=nvapi-xxxxxxxxxxxxxxxxxxxx
+STUDENT_NAME=Your Full Name
+STUDENT_EMAIL=your@email.com
 ```
 
-### Step 4 — Add your syllabi
+### Step 4 — Add your syllabus files
 Drop your syllabus files into the `syllabi/` folder.
 
-Supported formats: `.pdf`, `.docx`, `.txt`, `.md`
+Supported formats: `.pdf` `.docx` `.txt` `.md`
 
-Also add your work schedule as `work_schedule.txt` if you have one.
+Also add a file named `work_schedule.txt` if you have a part-time job (see format below).
 
 ### Step 5 — Run
 ```bash
-# Full run — reads syllabi/ folder
+# Full run — reads everything in syllabi/
 python3 syllaclaw.py
 
-# Specify your name for personalized output
+# Add your name for personalized output
 python3 syllaclaw.py --name "Alex Rivera"
 
-# Use a custom folder
-python3 syllaclaw.py --folder ./my_syllabi
+# Point at a different folder
+python3 syllaclaw.py --folder ./my_files
 
-# Run with sample files to see how it works
+# Run on the sample syllabi to see how it works before using your own
 python3 syllaclaw.py --demo
 
-# See the ESCALATE beat (what happens when a file is unreadable)
+# Trigger the ESCALATE beat — shows what happens when a file is unreadable
 python3 syllaclaw.py --break
 ```
 
 ### Step 6 — Import to Google Calendar
-After running, check the `output/` folder for:
-- `weekly_schedule.csv` — your time-blocked week
-- `semester_deadlines.csv` — all your deadlines
+
+After running, open the `output/` folder. You'll find:
+- `weekly_schedule.csv` — your full time-blocked week
+- `semester_deadlines.csv` — every deadline across all courses
 - `conflict_report.csv` — your heavy weeks and reschedule suggestions
 
 **To import:**
-1. Open [calendar.google.com](https://calendar.google.com)
-2. Click the ⚙ gear → **Settings**
+1. Go to [calendar.google.com](https://calendar.google.com)
+2. Click ⚙ gear → **Settings**
 3. Click **Import & Export** in the left sidebar
 4. Click **Select file** → choose `weekly_schedule.csv`
 5. Click **Import**
-6. Repeat for `semester_deadlines.csv`
+6. Repeat with `semester_deadlines.csv`
 
-Your semester is now in Google Calendar. Done.
+Your semester is in Google Calendar. Done.
 
 ---
 
 ## Option B — Google Apps Script Setup
 
-No installation needed. Works entirely in your browser.
+No installation. No terminal. Works entirely in your browser.
+
+### The Google Drive folder concept
+
+Option B mirrors Option A exactly — instead of a local folder on your laptop, you use a Google Drive folder. You upload your syllabus files there, paste the text into Google Sheets tabs, and the Apps Script reads them the same way the Python CLI reads your local folder.
 
 ### Step 1 — Get your free NVIDIA NIM key
-Same as Option A Step 1 above.
+Same as Option A Step 1.
 
 ### Step 2 — Create your Google Sheet
 1. Go to [sheets.google.com](https://sheets.google.com)
 2. Create a new blank spreadsheet
-3. Name it: `SyllaClaw`
+3. Name it `SyllaClaw`
 
 ### Step 3 — Add the script
 1. Click **Extensions → Apps Script**
-2. Delete any existing code
-3. Copy the entire contents of `scripts/SyllaClaw.gs` from this repo
-4. Paste it into the editor
-5. Find the `CONFIG` section at the top:
-   ```javascript
-   const CONFIG = {
-     NIM_API_KEY:    "YOUR_NIM_API_KEY_HERE",  // ← replace this
-     STUDENT_NAME:   "Your Name",              // ← add your name
-     ...
-   }
-   ```
-6. Replace the values with yours
-7. Click **Save** (Ctrl+S)
-8. Close the Apps Script tab
-9. Reload your Google Sheet
+2. Delete any existing code in the editor
+3. Open `scripts/SyllaClaw.gs` from this repo — copy the entire file
+4. Paste it into the Apps Script editor
+5. Find the `CONFIG` block at the top and fill in your values:
+```javascript
+const CONFIG = {
+  NIM_API_KEY:   "nvapi-xxxxxxxxxxxxxxxxxxxx",  // your free NIM key
+  STUDENT_NAME:  "Alex Rivera",                 // your name
+  SEMESTER_START: "2026-01-12",                 // first day of classes
+  SEMESTER_END:   "2026-05-15",                 // last day of finals
+  WAKE_TIME:      "07:00",                      // when you wake up
+  SLEEP_TIME:     "23:00",                      // when you go to sleep
+};
+```
+6. Click **Save** (Ctrl+S)
+7. Close the Apps Script tab
+8. Reload your Google Sheet
 
-A **SyllaClaw** menu will now appear in your Sheet.
+A **SyllaClaw** menu will appear in your Sheet toolbar.
 
 ### Step 4 — Add your syllabi
-Create sheet tabs named `Syllabus_1`, `Syllabus_2`, etc.
-Paste your syllabus text into cell **A1** of each tab.
 
-> **Google Drive tip:** Upload your PDF syllabi to Google Drive. Open them with Google Docs (right-click → Open with → Google Docs). Copy all the text. Paste into your Syllabus tab.
+**Option 1 — Paste text directly:**
+Create sheet tabs named `Syllabus_1`, `Syllabus_2`, etc. Paste your syllabus text into cell A1 of each tab.
 
-### Step 5 — Run
-Click **SyllaClaw** in the menu bar and choose:
-- **4. Full Run (Steps 1–3)** to do everything at once
+**Option 2 — From Google Drive (recommended for PDFs):**
+Upload your PDF syllabus to Google Drive. Right-click → Open with → Google Docs. Google Docs will extract the text from the PDF automatically. Select all (Cmd+A), copy, paste into your Syllabus tab.
 
-Or run each step individually:
-1. **1. Parse My Syllabi** — extracts all deadlines
-2. **2. Build My Week** — builds your time-blocked schedule
-3. **3. Push to Google Calendar** — creates real calendar events instantly
+### Step 5 — Add your work schedule (optional)
 
-No CSV import needed with Apps Script — events appear in Google Calendar the moment you click Step 3.
+Create a sheet tab named `Work Schedule`. Paste your shifts in this format:
+```
+Monday:    OFF
+Tuesday:   4:00 PM - 9:00 PM
+Thursday:  4:00 PM - 9:00 PM
+Saturday:  8:00 AM - 2:00 PM
+Sunday:    10:00 AM - 3:00 PM
+```
+
+### Step 6 — Run
+
+Click **SyllaClaw** in the menu and choose:
+- **4. Full Run (Steps 1–3)** — does everything at once
+
+Or step by step:
+1. **1. Parse My Syllabi** — reads all Syllabus tabs, extracts deadlines into a `Deadlines` tab
+2. **2. Build My Week** — builds your time-blocked schedule into a `Weekly Schedule` tab
+3. **3. Push to Google Calendar** — creates real events in a new `SyllaClaw` calendar instantly
+
+No CSV download needed. Events appear in Google Calendar the moment you run Step 3.
 
 ---
 
-## Work Schedule Format
+## Work schedule format
 
-Create a file called `work_schedule.txt` (CLI) or a `Work Schedule` sheet tab (Apps Script) with your shifts:
+Whether you're using the CLI or Apps Script, your work schedule should look like this:
 
 ```
 Monday:    OFF
@@ -168,22 +216,94 @@ Saturday:  8:00 AM - 2:00 PM  (6 hrs)
 Sunday:    10:00 AM - 3:00 PM (5 hrs)
 ```
 
-SyllaClaw will never schedule study time during your work shifts.
+SyllaClaw will never schedule a study block during a shift. Work hours are locked.
 
 ---
 
-## How the schedule is built
+## How the weekly schedule is built
 
-SyllaClaw uses NVIDIA's Llama-3.3-Nemotron-Super model to reason over your deadlines and build your week. Here is what it considers:
+SyllaClaw uses NVIDIA's Llama-3.3-Nemotron-Super model via NIM to reason over your full week. Here is exactly what it considers:
 
-- **Work shifts** — locked as non-negotiable
-- **Deadline urgency** — more study time allocated closer to due dates
-- **Study block sizing** — 25-minute Pomodoro blocks for memorization, 90-minute deep work blocks for problem sets
-- **Sleep** — consistent wake and bedtime every day
-- **Meals** — breakfast, lunch, dinner built in
-- **Family calls** — 10-minute "Call home" blocks 2–3 times per week
-- **Free time** — protected social and rest time, not filled with work
-- **Weekly review** — Sunday evening planning block
+| What | How |
+|------|-----|
+| Work shifts | Locked — never overwritten |
+| Sleep | Consistent wake and bedtime every day |
+| Study blocks | 25-min Pomodoro for memorization/reading, 90-min deep work for problem sets and projects |
+| Deadline urgency | More study time allocated in the days before something is due |
+| Exam prep | A review session is added the evening before every exam |
+| Meals | Breakfast, lunch, and dinner built into every day |
+| Family calls | 10-minute "Call home 📱" blocks 2–3 times per week |
+| Free time | At least one protected free/social block per day — labeled "Free time — protect this" |
+| Weekly review | 30-minute Sunday evening planning block every week |
+
+The agent does not fill every hour. It protects the things that make you human.
+
+---
+
+## What ESCALATE looks like
+
+When SyllaClaw hits something it can't handle, it stops and tells you exactly what went wrong:
+
+```
+ESCALATE — Cannot extract text from CHEM_5500.pdf
+Reason: File appears to be a scanned image or is empty.
+Fix: Re-upload as a text-based PDF, or paste the syllabus as a .txt file.
+```
+
+```
+ESCALATE — Cannot build a realistic schedule for Tuesday
+Reason: Work shift 4–9pm + 3 hours of class leaves only 1.5 hours.
+         Required study hours for this week need at least 6 hours Tuesday.
+Fix: Consider shifting Wednesday's study block or reducing scope this week.
+```
+
+No silent failures. No crashes. A precise diagnosis and a clear next step every time.
+
+Run the demo to see it fire live:
+```bash
+python3 syllaclaw.py --break
+```
+
+---
+
+## Project structure
+
+```
+syllaclaw/
+├── syllaclaw.py              # Entry point — run this
+├── src/
+│   ├── agent.py              # Main orchestrator — runs all 6 steps
+│   ├── nim_client.py         # All NVIDIA NIM API calls
+│   ├── reader.py             # Extracts text from PDF, DOCX, TXT, MD
+│   ├── schedule.py           # Conflict detection and date logic
+│   ├── exporter.py           # Google Calendar CSV output
+│   └── display.py            # Terminal colors and logging
+├── scripts/
+│   └── SyllaClaw.gs          # Google Apps Script — paste into Google Sheets
+├── syllabi/
+│   ├── samples/              # Two sample syllabi + work schedule for demo mode
+│   │   ├── ENGR3450_Thermodynamics.txt
+│   │   ├── CS4820_Machine_Learning.txt
+│   │   └── work_schedule.txt
+│   ├── samples_broken/       # Empty file that triggers the ESCALATE demo
+│   └── (drop your files here)
+├── output/                   # Generated CSV files land here — gitignored
+├── requirements.txt
+├── .env.example
+├── .gitignore
+└── README.md
+```
+
+---
+
+## Stack
+
+| Component | What it does | Cost |
+|-----------|-------------|------|
+| NVIDIA NIM | Parses syllabi, builds schedule, writes Sunday briefing | Free tier |
+| Google Calendar / Apps Script | Creates real calendar events | Free |
+| Python (pdfminer, python-docx) | Reads PDF and Word files | Free |
+| Apache Airflow (optional) | Automates the weekly Sunday briefing run | Free, open source |
 
 ---
 
@@ -192,57 +312,26 @@ SyllaClaw uses NVIDIA's Llama-3.3-Nemotron-Super model to reason over your deadl
 | Problem | Fix |
 |---------|-----|
 | `NIM_API_KEY not set` | Add your key to `.env` or run `export NIM_API_KEY=nvapi-xxxx` |
-| `No text extracted from PDF` | Your PDF is a scanned image. Open it in Google Docs to get text, then save as `.txt` |
-| `No deadlines found` | Make sure your syllabus contains dates and assignment names |
-| Timeout on first run | NIM can be slow on the first cold call — the tool retries automatically. Wait. |
-| Apps Script: `NIM API error 401` | Your API key is wrong or not set in CONFIG |
-| Apps Script: No SyllaClaw menu | Reload the Sheet after saving the script |
-
----
-
-## Project structure
-
-```
-syllaclaw/
-├── syllaclaw.py              # Main entry point
-├── src/
-│   ├── agent.py              # Main orchestrator
-│   ├── nim_client.py         # All NVIDIA API calls
-│   ├── reader.py             # PDF/DOCX/TXT extraction
-│   ├── schedule.py           # Conflict detection, schedule logic
-│   ├── exporter.py           # Google Calendar CSV export
-│   └── display.py            # Terminal colors and logging
-├── scripts/
-│   └── SyllaClaw.gs          # Google Apps Script implementation
-├── syllabi/
-│   ├── samples/              # Sample syllabi for demo mode
-│   └── (drop your files here)
-├── output/                   # Generated CSV files
-├── requirements.txt
-├── .env.example
-└── README.md
-```
-
----
-
-## The stack
-
-| Component | Role | Cost |
-|-----------|------|------|
-| NVIDIA NIM | Parses syllabi, builds schedule, writes briefing | Free tier |
-| Google Calendar API / Apps Script | Creates real calendar events | Free |
-| Apache Airflow (optional) | Runs weekly Sunday briefing automatically | Free |
-| Python / Apps Script | Orchestration | Free |
+| `No text extracted from PDF` | PDF is a scanned image — open in Google Docs to extract text, save as `.txt` |
+| `No deadlines found` | Check that your syllabus file has dates and assignment names in it |
+| Timeout on first run | NIM can be slow on the first call — the agent retries at 120s, 150s, 180s automatically |
+| Apps Script `401 error` | Your NIM API key in CONFIG is wrong or missing |
+| Apps Script: no SyllaClaw menu | Close and reload the Google Sheet after saving the script |
+| `pip3: command not found` | Try `pip` instead of `pip3` |
+| Files not found | Make sure your syllabus files are in the `syllabi/` folder, not a subfolder inside it |
 
 ---
 
 ## Built by
 
-**Chanel Power** — Senior ML Engineer, Founder of [Mentor Me Collective](https://mentormecollective.org)
+**Chanel Power** — Senior ML Engineer, Forbes Under 30, Founder of [Mentor Me Collective](https://mentormecollective.org)
+
+Mentor Me Collective is a 501(c)(3) Technical Institute serving 40,000+ members across 120+ countries with 600+ documented career placements.
 
 - GitHub: [@itsChanelML](https://github.com/itsChanelML)
-- LinkedIn: [Chanel Power](https://linkedin.com/in/chanelpower)
+- LinkedIn: [/in/chanelpower](https://linkedin.com/in/chanelpower)
 - Community: [mentormecollective.org](https://mentormecollective.org)
+- Twitter/X: [@itsChanelML](https://twitter.com/itsChanelML)
 
 ---
 
