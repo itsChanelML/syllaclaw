@@ -181,7 +181,7 @@ Same as Option A Step 1.
 ### Step 3 — Add the script
 1. Click **Extensions → Apps Script**
 2. Delete any existing code in the editor
-3. Open `scripts/SyllaClaw.gs` from this repo — copy the entire file
+3. Open `scripts/APPSCRIPT.js` from this repo — copy the entire file
 4. Paste it into the Apps Script editor
 5. Find the `CONFIG` block at the top and fill in your values:
 ```javascript
@@ -310,7 +310,8 @@ syllaclaw/
 │   ├── memory.py             # Student behavioral profile and weekly check-in
 │   └── display.py            # Terminal colors and logging
 ├── scripts/
-│   └── SyllaClaw.gs          # Google Apps Script — paste into Google Sheets
+│   ├── APPSCRIPT.js          # Google Apps Script — paste into Google Sheets
+│   └── APPSCRIPT.md          # Apps Script setup notes
 ├── syllabi/
 │   ├── samples/              # Two sample syllabi + work schedule for demo mode
 │   │   ├── ENGR3450_Thermodynamics.txt
